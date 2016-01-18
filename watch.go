@@ -6,7 +6,7 @@ import (
 
 	"github.com/omeid/gonzo/context"
 	"github.com/omeid/kargar"
-	"github.com/omeid/slurp/tools/glob"
+	"github.com/go-gonzo/fs/glob"
 	"gopkg.in/fsnotify.v1"
 )
 
