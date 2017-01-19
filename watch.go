@@ -1,12 +1,13 @@
 package watch
 
 import (
+	"path/filepath"
 	"sync/atomic"
 	"time"
 
+	"github.com/go-gonzo/fs/glob"
 	"github.com/omeid/gonzo/context"
 	"github.com/omeid/kargar"
-	"github.com/go-gonzo/fs/glob"
 	"gopkg.in/fsnotify.v1"
 )
 
@@ -27,6 +28,7 @@ func throttle(limit time.Duration) func(func()) bool {
 	}
 }
 
+// Watcher ...
 func Watcher(ctx context.Context, cb func(string), globs ...string) error {
 
 	files, err := glob.Glob(globs...)
@@ -41,6 +43,7 @@ func Watcher(ctx context.Context, cb func(string), globs ...string) error {
 	}
 
 	for matchpair := range files {
+		w.Add(filepath.Dir(matchpair.Name))
 		w.Add(matchpair.Name)
 	}
 
@@ -49,6 +52,7 @@ func Watcher(ctx context.Context, cb func(string), globs ...string) error {
 		for {
 			select {
 			case event := <-w.Events:
+				ctx.Debugf("gonzo:watch:Event %v on %v", event, event.Name)
 				//if event.Op&fsnotify.Write == fsnotify.Write {
 				//event.Op&fsnotify.Create == fsnotify.Create ||
 				throttled(func() {
@@ -69,7 +73,8 @@ func Watcher(ctx context.Context, cb func(string), globs ...string) error {
 	return nil
 }
 
-func WatchSet(cb func(context.Context, ...string) error, watches map[string][]string) kargar.Action {
+// WatcherSet is like watcher...
+func WatcherSet(cb func(context.Context, ...string) error, watches map[string][]string) kargar.Action {
 	return func(ctx context.Context) error {
 
 		//function wrapper to copy set and files.
