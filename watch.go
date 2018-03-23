@@ -5,10 +5,10 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/go-gonzo/fs/glob"
 	"github.com/omeid/gonzo/context"
 	"github.com/omeid/kargar"
-	"gopkg.in/fsnotify.v1"
 )
 
 func throttle(limit time.Duration) func(func()) bool {
